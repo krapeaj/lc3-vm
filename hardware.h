@@ -1,10 +1,12 @@
+#ifndef HARDWARE_HEADER
+#define HARDWARE_HEADER
 #include <stdlib.h>
 
 /* Memory */
 uint16_t memory[__UINT16_MAX__];
 
 /* Registers */
-enum {
+enum Register {
     R_R0,
     R_R1,
     R_R2,
@@ -21,7 +23,7 @@ enum {
 uint16_t reg[R_COUNT];
 
 /* Instruction set */
-enum {
+enum Operation {
     OP_BR,  // branch
     OP_ADD, // add
     OP_LD,  // load
@@ -45,4 +47,6 @@ enum {
     FL_POS = 1 << 0, // P
     FL_ZRO = 1 << 1, // Z
     FL_NEG = 1 << 2  // N
-}
+};
+
+#endif
