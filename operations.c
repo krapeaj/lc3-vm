@@ -27,6 +27,9 @@ void update_flags(uint16_t r) {
     }
 }
 
+/*
+    ADD operation.
+*/
 void add(uint16_t instr) {
     // destination register (DR)
     uint16_t r_dest = (instr >> 9) & 0x7;
@@ -43,6 +46,20 @@ void add(uint16_t instr) {
         uint16_t r_src1 = instr & 0x7;
         reg[r_dest] = reg[r_src0] + r_src1;
     }
+    update_flags(r_dest);
+}
 
+/*
+    Operation to indirectly load value.
+*/
+void load_indirect(u_int16_t instr) {
+    // destination register (DR)
+    uint16_t r_dest = (instr >> 9) & 0x7;
+    // PC offset (9-bits)
+    uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
+
+    // add pc_offset to the current PC -> another memory address
+    // then use that address to load the actual value
+    reg[r_dest] = mem_read(mem_read(reg[R_PC] + pc_offset));
     update_flags(r_dest);
 }
