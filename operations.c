@@ -29,6 +29,9 @@ void update_flags(uint16_t r) {
 
 /*
     ADD operation.
+    Assembler example:
+        ADD DR, SR1, SR2
+        ADD DR, SR1, imm5
 */
 void add(uint16_t instr) {
     // destination register (DR)
@@ -45,6 +48,27 @@ void add(uint16_t instr) {
     else {
         uint16_t r_src1 = instr & 0x7;
         reg[r_dest] = reg[r_src0] + r_src1;
+    }
+    update_flags(r_dest);
+}
+
+/*
+    Assembler example:
+        AND DR, SR1, SR2
+        AND DR, SR1, imm5
+*/
+void and_operation(uint16_t instr) {
+    uint16_t r_dest = (instr >> 9) & 0x7;
+    uint16_t r_src0 = (instr >> 6) & 0x7;
+    uint16_t imm_flag = (instr >> 5) & 0x1;
+
+    if (imm_flag) {
+        uint16_t imm5 = sign_extend(instr & 0x4, 5);
+        reg[r_dest] = reg[r_src0] & imm5;
+    }
+    else {
+        uint16_t r_src1 = instr & 0x7;
+        reg[r_dest] = reg[r_src0] & r_src1;
     }
     update_flags(r_dest);
 }
