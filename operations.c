@@ -1,4 +1,5 @@
 #include "hardware.h"
+#include <stdio.h>
 
 /*
     To extend a number to be 16 bits, whether the number is
@@ -53,11 +54,12 @@ void add(uint16_t instr) {
 }
 
 /*
+    Bit-wise AND operation.
     Assembler example:
         AND DR, SR1, SR2
         AND DR, SR1, imm5
 */
-void and_operation(uint16_t instr) {
+void bitwise_and(uint16_t instr) {
     uint16_t r_dest = (instr >> 9) & 0x7;
     uint16_t r_src0 = (instr >> 6) & 0x7;
     uint16_t imm_flag = (instr >> 5) & 0x1;
@@ -65,8 +67,7 @@ void and_operation(uint16_t instr) {
     if (imm_flag) {
         uint16_t imm5 = sign_extend(instr & 0x4, 5);
         reg[r_dest] = reg[r_src0] & imm5;
-    }
-    else {
+    } else {
         uint16_t r_src1 = instr & 0x7;
         reg[r_dest] = reg[r_src0] & r_src1;
     }
@@ -74,9 +75,56 @@ void and_operation(uint16_t instr) {
 }
 
 /*
+    Conditional Branch (BR)
+    BRn LABEL BRzp LABEL
+    BRz LABEL BRnp LABEL
+*/
+void branch(uint16_t instr) {
+    uint16_t cond_flag = (instr >> 9) & 0x7;
+    if (cond_flag & reg[R_COND]) {
+        uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
+        reg[R_PC] += pc_offset;
+    }
+}
+
+/*
+    Jump (JMP) operation.
+    Also handles Return from Subroutine (RET).
+*/
+void jump(uint16_t instr) {
+    uint16_t jump_location = (instr >> 6) & 0x7;
+    reg[R_PC] = reg[jump_location];
+}
+
+/*
+    Jump to Subroutine (JSR and JSRR).
+*/
+void jump_to_subroutine(uint16_t instr) {
+    reg[R_R7] = reg[R_PC];
+    uint16_t flag = (instr >> 11) & 0x1;
+    if (flag) {
+        uint16_t pc_offset = sign_extend(instr & 0x7FF, 11);
+        reg[R_PC] += pc_offset;
+    } else {
+        uint16_t r1 = (instr >> 6) & 0x7;
+        reg[R_PC] = reg[r1];
+    }
+}
+
+/*
+    Load (LD).
+*/
+void load(uint16_t instr) {
+    uint16_t r_dest = (instr >> 9) & 0x7;
+    uint16_t pc_offset = (instr & 0x1FF, 9);
+    reg[r_dest] = mem_read(reg[R_PC] + pc_offset);
+    update_flags(r_dest);
+}
+
+/*
     Operation to indirectly load value.
 */
-void load_indirect(u_int16_t instr) {
+void load_indirect(uint16_t instr) {
     // destination register (DR)
     uint16_t r_dest = (instr >> 9) & 0x7;
     // PC offset (9-bits)
@@ -86,4 +134,72 @@ void load_indirect(u_int16_t instr) {
     // then use that address to load the actual value
     reg[r_dest] = mem_read(mem_read(reg[R_PC] + pc_offset));
     update_flags(r_dest);
+}
+
+/*
+    Load Base + offset (LDR).
+*/
+void load_base_offset(uint16_t instr) {
+    uint16_t r_dest = (instr >> 9) & 0x7;
+    uint16_t r1 = (instr >> 6) & 0x7;
+    uint16_t offset = sign_extend(instr & 0x3F, 6);
+    reg[r_dest] = mem_read(reg[r1] + offset);
+    update_flags(r_dest);
+}
+
+/*
+    Load Effective Address.
+    Assembler format:
+        LEA DR, LABEL
+*/
+void load_effective_address(uint16_t instr) {
+    uint16_t r_dest = (instr >> 9) & 0x7;
+    uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
+    reg[r_dest] = reg[R_PC] + pc_offset;
+    update_flags(r_dest);
+}
+
+/*
+    Bit-wise NOT operation.
+*/
+void bitwise_not(uint16_t instr) {
+    uint16_t r_dest = (instr >> 9) & 0x7;
+    uint16_t r_src = (instr >> 6) & 0x7;
+    reg[r_dest] = ~reg[r_src];
+    update_flags(r_dest);
+}
+
+/*
+    Return from Interrupt (RTI). UNUSED.
+*/
+void return_from_interrupt(uint16_t instr) {
+    abort();   
+}
+
+/*
+    Store (ST).
+*/
+void store(uint16_t instr) {
+    uint16_t r_src = (instr >> 9) & 0x7;
+    uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
+    mem_write(reg[R_PC] + pc_offset, reg[r_src]);
+}
+
+/*
+    Store Indirect (STI).
+*/
+void store_indirect(uint16_t instr) {
+    uint16_t r_src = (instr >> 9) & 0x7;
+    uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
+    mem_write(mem_read(reg[R_PC] + pc_offset), reg[r_src]);
+}
+
+/*
+    Store Base + offset.
+*/
+void store_base_offset(uint16_t instr) {
+    uint16_t r_src = (instr >> 9) & 0x7;
+    uint16_t r_base = (instr >> 6) & 0x7;
+    uint16_t offset = sign_extend(instr & 0x3F, 6);
+    mem_write(reg[r_base] + offset, reg[r_src]);
 }
