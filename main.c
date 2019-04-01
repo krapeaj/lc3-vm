@@ -7,7 +7,6 @@ int main(int argc, const *argv[]) {
     enum { PC_START = 0x3000};
     reg[R_PC] = PC_START;
 
-    int running = 1;
     while (running) {
         // Fetch
         uint16_t instruction = mem_read(reg[R_PC]++);
@@ -19,48 +18,51 @@ int main(int argc, const *argv[]) {
                 add(instruction);
                 break;
             case OP_AND:
-                /* code */
+                bitwise_and(instruction);
                 break;
             case OP_NOT:
-                /* code */
+                bitwise_not(instruction);
                 break;
             case OP_BR:
-                /* code */
+                branch(instruction);
                 break;
             case OP_JMP:
-                /* code */
+                jump(instruction);
                 break;
             case OP_JSR:
-                /* code */
+                jump_to_subroutine(instruction);
                 break;
             case OP_LD:
-                /* code */
+                load(instruction);
                 break;
             case OP_LDI:
-                /* code */
+                load_indirect(instruction);
                 break;
             case OP_LDR:
-                /* code */
+                load_base_offset(instruction);
                 break;
             case OP_LEA:
-                /* code */
+                load_effective_address(instruction);
                 break;
             case OP_ST:
-                /* code */
+                store(instruction);
                 break;
             case OP_STI:
-                /* code */
+                store_indirect(instruction);
                 break;
             case OP_STR:
-                /* code */
+                store_base_offset(instruction);
                 break;
             case OP_TRAP:
-                /* code */
+                system_call(instruction);
                 break;
             case OP_RES:
+                abort();
             case OP_RTI:
+                return_from_interrupt(instruction); // abort
             default:
                 // bad code
+                printf("Unknown operation\n");
                 break;
         }
     }

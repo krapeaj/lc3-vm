@@ -2,6 +2,9 @@
 #define HARDWARE_HEADER
 #include <stdlib.h>
 
+/* VM running state */
+int running = 1;
+
 /* Memory */
 uint16_t memory[__UINT16_MAX__];
 

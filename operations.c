@@ -195,11 +195,86 @@ void store_indirect(uint16_t instr) {
 }
 
 /*
-    Store Base + offset.
+    Store Base + offset (STR).
 */
 void store_base_offset(uint16_t instr) {
     uint16_t r_src = (instr >> 9) & 0x7;
     uint16_t r_base = (instr >> 6) & 0x7;
     uint16_t offset = sign_extend(instr & 0x3F, 6);
     mem_write(reg[r_base] + offset, reg[r_src]);
+}
+
+/* GETC system call - get character from keyboard */
+void trap_getc() {
+    reg[R_R0] = (uint16_t) getchar();
+}
+
+/* OUT system call - output a character */
+void trap_out() {
+    putc((char) reg[R_R0], stdout);
+    fflush(stdout);
+}
+
+/* PUTS system call - output a string */
+void trap_puts() {
+    uint16_t *c = memory + reg[R_R0];
+    while (*c) {
+        putc((char) *c, stdout);
+        ++c;
+    }
+    fflush(stdout);
+}
+
+/* IN system call - input a string */
+void trap_in() {
+    printf("Enter a character: ");
+    reg[R_R0] = (uint16_t) getchar();
+}
+
+/* PUTSP system call - output a byte string */
+void trap_putsp() {
+    uint16_t *str = memory + reg[R_R0];
+    while (*str) {
+        char c1 = (*str) & 0xFF;
+        putc((char) c1, stdout);
+        char c2 = (*str) >> 8;
+        putc((char) c2, stdout);
+        ++str;
+    }
+    fflush(stdout);
+}
+
+/* HALT system call - halt the program */
+void trap_halt() {
+   puts("HALT"); 
+   fflush(stdout);
+   running = 0;
+}
+
+/*
+    System Call operation (TRAP).
+*/
+void system_call(uint16_t instr) {
+    switch (instr & 0xFF) {
+        case TRAP_GETC:
+            /* code */
+            break;
+        case TRAP_OUT:
+            /* code */
+            break;
+        case TRAP_PUTS:
+            /* code */
+            break;
+        case TRAP_IN:
+            /* code */
+            break;
+        case TRAP_PUTSP:
+            /* code */
+            break;
+        case TRAP_HALT:
+            /* code */
+            break;
+        default:
+            break;
+    }
 }
