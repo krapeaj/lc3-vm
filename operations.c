@@ -1,5 +1,5 @@
-#include "hardware.h"
 #include <stdio.h>
+#include "hardware.h"
 
 /*
     To extend a number to be 16 bits, whether the number is

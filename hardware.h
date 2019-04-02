@@ -25,6 +25,12 @@ enum Register {
 
 uint16_t reg[R_COUNT];
 
+/* Memory mapped registers */
+enum {
+    MR_KBSR = 0xFE00, // keyboard status
+    MR_KBDR = 0xFE02  // keyboard data
+}; 
+
 /* Instruction set */
 enum Operation {
     OP_BR,  // branch

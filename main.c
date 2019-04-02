@@ -1,7 +1,27 @@
+#include <stdio.h>
 #include "hardware.h"
 #include "operations.h"
+#include "functions.h"
 
-int main(int argc, const *argv[]) {
+int main(int argc, const char *argv[]) {
+
+    // load arguments
+    if (argc < 2) {
+        printf("USAGE: lc3 [image-file] ...\n");
+        exit(2);
+    }
+
+    for (int i = 1; i < argc; ++i) {
+        char *image_path = argv[i];
+        if (!read_image(image_path)) {
+            printf("Failed to load image: %s\n", argv[i]);
+            exit(1);
+        }
+    }
+
+    // Set up
+    signal(SIGINT, handle_interrupt);
+    disable_input_buffering(); // Unix specific
 
     // Set PC starting position (default = 0x3000)
     enum { PC_START = 0x3000};
@@ -66,4 +86,7 @@ int main(int argc, const *argv[]) {
                 break;
         }
     }
+
+    // Shutdown
+    restore_input_buffering(); // Unix specific
 }
