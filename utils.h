@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
+#ifndef VM_UTILS
+#define VM_UTILS
 
-uint16_t swap(uint16_t x);
+#include <stdio.h>
 
 void read_image_file(FILE *file);
 
@@ -16,3 +16,5 @@ void disable_input_buffering();
 void restore_input_buffering();
 
 void handle_interrupt(int signal);
+
+#endif

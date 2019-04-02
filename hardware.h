@@ -1,5 +1,6 @@
-#ifndef HARDWARE_HEADER
-#define HARDWARE_HEADER
+#ifndef VM_HARDWARE_COMPONENTS
+#define VM_HARDWARE_COMPONENTS
+
 #include <stdlib.h>
 
 /* VM running state */

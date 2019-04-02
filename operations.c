@@ -1,5 +1,7 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include "hardware.h"
+#include "utils.h"
 
 /*
     To extend a number to be 16 bits, whether the number is
@@ -75,6 +77,16 @@ void bitwise_and(uint16_t instr) {
 }
 
 /*
+    Bit-wise NOT operation.
+*/
+void bitwise_not(uint16_t instr) {
+    uint16_t r_dest = (instr >> 9) & 0x7;
+    uint16_t r_src = (instr >> 6) & 0x7;
+    reg[r_dest] = ~reg[r_src];
+    update_flags(r_dest);
+}
+
+/*
     Conditional Branch (BR)
     BRn LABEL BRzp LABEL
     BRz LABEL BRnp LABEL
@@ -116,7 +128,7 @@ void jump_to_subroutine(uint16_t instr) {
 */
 void load(uint16_t instr) {
     uint16_t r_dest = (instr >> 9) & 0x7;
-    uint16_t pc_offset = (instr & 0x1FF, 9);
+    uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
     reg[r_dest] = mem_read(reg[R_PC] + pc_offset);
     update_flags(r_dest);
 }
@@ -156,16 +168,6 @@ void load_effective_address(uint16_t instr) {
     uint16_t r_dest = (instr >> 9) & 0x7;
     uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
     reg[r_dest] = reg[R_PC] + pc_offset;
-    update_flags(r_dest);
-}
-
-/*
-    Bit-wise NOT operation.
-*/
-void bitwise_not(uint16_t instr) {
-    uint16_t r_dest = (instr >> 9) & 0x7;
-    uint16_t r_src = (instr >> 6) & 0x7;
-    reg[r_dest] = ~reg[r_src];
     update_flags(r_dest);
 }
 
@@ -257,22 +259,22 @@ void trap_halt() {
 void system_call(uint16_t instr) {
     switch (instr & 0xFF) {
         case TRAP_GETC:
-            /* code */
+            trap_getc();
             break;
         case TRAP_OUT:
-            /* code */
+            trap_out();
             break;
         case TRAP_PUTS:
-            /* code */
+            trap_puts();
             break;
         case TRAP_IN:
-            /* code */
+            trap_in();
             break;
         case TRAP_PUTSP:
-            /* code */
+            trap_putsp();
             break;
         case TRAP_HALT:
-            /* code */
+            trap_halt();
             break;
         default:
             break;

@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include "hardware.h"
 #include "operations.h"
-#include "functions.h"
+#include "utils.h"
 
 int main(int argc, const char *argv[]) {
-
     // load arguments
     if (argc < 2) {
         printf("USAGE: lc3 [image-file] ...\n");
@@ -12,8 +11,7 @@ int main(int argc, const char *argv[]) {
     }
 
     for (int i = 1; i < argc; ++i) {
-        char *image_path = argv[i];
-        if (!read_image(image_path)) {
+        if (!read_image(argv[i])) {
             printf("Failed to load image: %s\n", argv[i]);
             exit(1);
         }
