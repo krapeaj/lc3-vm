@@ -148,7 +148,7 @@ void add(uint16_t instr) {
     }
     else {
         uint16_t r_src1 = instr & 0x7;
-        reg[r_dest] = reg[r_src0] + r_src1;
+        reg[r_dest] = reg[r_src0] + reg[r_src1];
     }
     update_flags(r_dest);
 }
@@ -165,11 +165,11 @@ void bitwise_and(uint16_t instr) {
     uint16_t imm_flag = (instr >> 5) & 0x1;
 
     if (imm_flag) {
-        uint16_t imm5 = sign_extend(instr & 0x4, 5);
+        uint16_t imm5 = sign_extend(instr & 0x1F, 5);
         reg[r_dest] = reg[r_src0] & imm5;
     } else {
         uint16_t r_src1 = instr & 0x7;
-        reg[r_dest] = reg[r_src0] & r_src1;
+        reg[r_dest] = reg[r_src0] & reg[r_src1];
     }
     update_flags(r_dest);
 }
@@ -336,9 +336,9 @@ void trap_putsp() {
     uint16_t *str = memory + reg[R_R0];
     while (*str) {
         char c1 = (*str) & 0xFF;
-        putc((char) c1, stdout);
+        putc(c1, stdout);
         char c2 = (*str) >> 8;
-        putc((char) c2, stdout);
+        if (c2) putc(c2, stdout);
         ++str;
     }
     fflush(stdout);
@@ -378,6 +378,7 @@ void system_call(uint16_t instr) {
             break;
     }
 }
+
 int main(int argc, const char *argv[]) {
     // load arguments
     if (argc < 2) {
@@ -450,12 +451,11 @@ int main(int argc, const char *argv[]) {
                 system_call(instruction);
                 break;
             case OP_RES:
-                abort();
             case OP_RTI:
-                return_from_interrupt(instruction); // abort
             default:
                 // bad code
                 printf("Unknown operation\n");
+                abort();
                 break;
         }
     }

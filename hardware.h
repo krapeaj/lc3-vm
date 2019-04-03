@@ -1,17 +1,17 @@
 #ifndef VM_HARDWARE_COMPONENTS
 #define VM_HARDWARE_COMPONENTS
 
-#include <stdlib.h>
+#include <stdlib.h> 
 
 /* VM running state */
 int running = 1;
 
 /* Memory */
-uint16_t memory[__UINT16_MAX__];
+uint16_t memory[UINT16_MAX];
 
 /* Registers */
 typedef enum Register_t {
-    R_R0,
+    R_R0 = 0,
     R_R1,
     R_R2,
     R_R3,
@@ -34,7 +34,7 @@ typedef enum MMR_t {
 
 /* Instruction set */
 typedef enum Operation_t {
-    OP_BR,  // branch
+    OP_BR = 0,  // branch
     OP_ADD, // add
     OP_LD,  // load
     OP_ST,  // store
